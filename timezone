@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+import argparse
+from datetime import datetime
+import pytz
+
+parser = argparse.ArgumentParser(description="Time Zone")
+parser.add_argument('-c', '--code', help="Country Code(ISO)", nargs='+', default=['de'])
+args = parser.parse_args()
+
+
+def abbriviation(zone):
+    common_name = pytz.timezone(zone)
+    abbr = common_name.localize(datetime.now(), is_dst=None)
+    return abbr.tzname()
+
+def print_utc_local_time():
+    print("Local time: {0}, UTC: {1}".format(datetime.now().strftime("%d/%m/%YT%H:%M:%S"),
+                                             datetime.utcnow().strftime("%d/%m/%YT%H:%M:%S")))
+
+def country_time(country):
+    country_tzones = pytz.country_timezones[country]
+    for zone in country_tzones:
+        tz = pytz.timezone(zone)
+        print("{0:40}{1:15}{2:25}".format(zone,
+                                          abbriviation(zone),
+                                          datetime.now(tz).strftime("%d/%m/%YT%H:%M:%S")))
+
+if __name__ == "__main__":
+    if args.code:
+        print("-" * 82)
+        print("{0:40}{1:15}{2:25}".format("Zone", "Abbreviation", "Time"))
+        print("-" * 82)
+        for county in args.code:
+            country_time(county)
+        print("-" * 82)
+        print_utc_local_time()
+        print("-" * 82)
